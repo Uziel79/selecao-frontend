@@ -11,7 +11,8 @@ const ModalNewVideo = ({
   handleAddNewVideo,
   handleChangeTitleInput,
   handleChangeLinkInput,
-  inputs,
+  linkInput,
+  titleInput,
 }) => (
   <BackgroundModal className={visibleModal ? 'showModal' : 'hideModal'}>
     <Modal>
@@ -22,7 +23,7 @@ const ModalNewVideo = ({
         <Title>
 Adicionar vídeo
         </Title>
-        <Form onSubmit={e => handleAddNewVideo(e, { title: inputs.title, link: inputs.link })}>
+        <Form onSubmit={e => handleAddNewVideo(e, { title: linkInput, link: titleInput })}>
           <input
             type="text"
             name="title"
@@ -50,10 +51,8 @@ ModalNewVideo.propTypes = {
   handleAddNewVideo: PropTypes.func.isRequired,
   handleChangeTitleInput: PropTypes.func.isRequired,
   handleChangeLinkInput: PropTypes.func.isRequired,
-  inputs: PropTypes.shape({
-    title: PropTypes.string,
-    link: PropTypes.string,
-  }).isRequired,
+  titleInput: PropTypes.string.isRequired,
+  linkInput: PropTypes.string.isRequired,
 };
 
 export default ModalNewVideo;

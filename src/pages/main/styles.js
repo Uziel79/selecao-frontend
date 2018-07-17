@@ -15,4 +15,8 @@ export const FiltersContainer = styled.div`
   }
 `;
 
-export const Filters = styled.div``;
+export const Filters = styled.div`
+
+`;
+
+export const OrderItem = styled.span``;

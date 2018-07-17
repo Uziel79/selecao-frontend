@@ -6,7 +6,12 @@ import Video from '../../components/Video';
 import ModalVideo from '../../components/ModalVideo';
 import ModalNewVideo from '../../components/ModalNewVideo';
 
-import { Container } from './styles';
+import {
+  Container,
+  FiltersContainer,
+  Filters,
+  OrderItem,
+} from './styles';
 
 class Main extends Component {
   state = {
@@ -19,10 +24,8 @@ class Main extends Component {
       likes: '',
       views: '',
     },
-    modalInsert: {
-      title: '',
-      link: '',
-    },
+    titleInput: '',
+    linkInput: '',
     videosListArray: [],
   };
 
@@ -32,17 +35,37 @@ class Main extends Component {
     this.setState({ videosListArray: data.videos });
   }
 
-  handleSearch = (event, _search) => {
-    event.preventDefault();
-
-    this.setState({ searchInput: '' });
-  };
-
   handleOpenModalVideo = (event, videoActive) => {
     event.preventDefault();
 
-    this.setState({ videoActive, modalVideoVisible: true });
+    const { videosListArray: videos } = this.state;
+
+    const index = videos.findIndex(item => item.id === videoActive.id);
+
+    const videoSelected = videos[index];
+
+    videoSelected.views += 1;
+
+    videos[index] = videoSelected;
+
+    this.setState({ videosListArray: videos, videoActive, modalVideoVisible: true });
   };
+
+  handleLikeVideo = (event, id) => {
+    event.preventDefault();
+
+    const { videosListArray: videos } = this.state;
+
+    const index = videos.findIndex(item => item.id === id);
+
+    const videoSelected = videos[index];
+
+    videoSelected.likes += 1;
+
+    videos[index] = videoSelected;
+
+    this.setState({ videosListArray: videos });
+  }
 
   handleOpenAddModal = (event) => {
     event.preventDefault();
@@ -55,9 +78,24 @@ class Main extends Component {
 
     const { videosListArray } = this.state;
 
-    const { _rest, idVideo } = link.split('https://youtu.be/');
+    const idVideo = link.split('https://youtu.be/');
 
-    this.setState({ modalInsert: { title: '', link: '' }, videosListArray: [...videosListArray, { id: idVideo, title, views: 0, likes: 0 }] });
+    const id = idVideo[1];
+
+    console.log(title);
+
+    this.setState({
+      titleInput: '',
+      linkInput: '',
+      videosListArray: [...videosListArray,
+        {
+          id,
+          title,
+          views: 0,
+          likes: 0,
+        },
+      ],
+    });
   };
 
   handleCloseModalVideo = (event) => {
@@ -81,11 +119,55 @@ class Main extends Component {
   };
 
   handleChangeTitleInput = (event) => {
-    this.setState({ modalInsert: { title: event.target.value } });
+    this.setState({ titleInput: event.target.value });
   }
 
   handleChangeLinkInput = (event) => {
-    this.setState({ modalInsert: { link: event.target.value } });
+    this.setState({ linkInput: event.target.value });
+  }
+
+  handleSearch = (event) => {
+    event.preventDefault();
+
+    const {
+      videosListArray: videos,
+    } = this.state;
+
+    const newList = videos.filter(video => (
+      video.title.toLowerCase().search(event.target.value.toLowerCase() !== -1)
+    ));
+
+    this.setState({
+      videosListArray: newList,
+    });
+  }
+
+  handleSortByViews = (event) => {
+    event.preventDefault();
+
+    const {
+      videosListArray: videos,
+    } = this.state;
+
+    const sortList = videos.sort((a, b) => a.views > b.views);
+
+    this.setState({
+      videosListArray: sortList,
+    });
+  }
+
+  handleSortByLikes = (event) => {
+    event.preventDefault();
+
+    const {
+      videosListArray: videos,
+    } = this.state;
+
+    const sortList = videos.sort((a, b) => a.likes > b.likes);
+
+    this.setState({
+      videosListArray: sortList,
+    });
   }
 
   render() {
@@ -94,7 +176,8 @@ class Main extends Component {
       modalVideoVisible,
       modalAddNewVisible,
       videoActive,
-      modalInsert,
+      titleInput,
+      linkInput,
       videosListArray,
     } = this.state;
 
@@ -109,30 +192,36 @@ class Main extends Component {
           visibleModal={modalVideoVisible}
           data={videoActive}
           handleCloseModalVideo={this.handleCloseModalVideo}
+          handleLikeVideo={this.handleLikeVideo}
         />
         <ModalNewVideo
           visibleModal={modalAddNewVisible}
-          inputs={modalInsert}
+          titleInput={titleInput}
+          linkInput={linkInput}
           handleAddNewVideo={this.handleAddNewVideo}
           handleCloseAddNewVideo={this.handleCloseAddNewVideo}
           handleChangeTitleInput={this.handleChangeTitleInput}
           handleChangeLinkInput={this.handleChangeLinkInput}
         />
+        <FiltersContainer>
+          <p>
+          Últimos Vídeos
+          </p>
+          <Filters>
+            <p>
+            Ordenar por:
+            </p>
+            <OrderItem onClick={e => this.handleSortByLikes(e)}>
+              <i className="fa fa-heart" aria-hidden="true" />
+              Likes
+            </OrderItem>
+            <OrderItem onClick={e => this.handleSortByViews(e)}>
+              <i className="fa fa-eye" aria-hidden="true" />
+              Visualizações
+            </OrderItem>
+          </Filters>
+        </FiltersContainer>
         <Container>
-          <FiltersContainer>
-            <p>Últimos Vídeos</p>
-            <Filters>
-              <p>Ordenar por:</p>
-              <OrderItem>
-                <i className="fa fa-heart" aria-hidden="true" />
-                Likes
-              </OrderItem>
-              <OrderItem>
-                <i className="fa fa-eye" aria-hidden="true" />
-                Visualizações
-              </OrderItem>
-            </Filters>
-          </FiltersContainer>
           {videosListArray.map(video => (
             <Video key={video.id} data={video} handleOpenModalVideo={this.handleOpenModalVideo} />
           ))}
