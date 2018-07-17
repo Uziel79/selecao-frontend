@@ -5,7 +5,7 @@ import {
   Container, Title, Content, SearchBar, ButtonAdd,
 } from './styles';
 
-const Header = ({ handleOpenAddModal }) => (
+const Header = ({ handleOpenAddModal, handleSearch }) => (
   <Container>
     <Title>
       <span className="sanar">
@@ -17,7 +17,13 @@ Flix
     </Title>
     <Content>
       <SearchBar>
-        <input type="text" name="search" id="search" placeholder="Buscar por Nome" />
+        <input
+          type="text"
+          name="search"
+          id="search"
+          placeholder="Buscar por Nome"
+          onChange={e => handleSearch(e)}
+        />
       </SearchBar>
       <ButtonAdd onClick={e => handleOpenAddModal(e)}>
 Adicionar Novo Vídeo
@@ -28,6 +34,7 @@ Adicionar Novo Vídeo
 
 Header.propTypes = {
   handleOpenAddModal: PropTypes.func.isRequired,
+  handleSearch: PropTypes.func.isRequired,
 };
 
 export default Header;

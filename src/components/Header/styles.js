@@ -29,7 +29,7 @@ export const Content = styled.div`
   flex-direction: row;
 `;
 
-export const SearchBar = styled.form`
+export const SearchBar = styled.div`
   width: 100%;
   height: 62px;
   flex: 1;

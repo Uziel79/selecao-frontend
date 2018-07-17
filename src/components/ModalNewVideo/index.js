@@ -17,13 +17,13 @@ const ModalNewVideo = ({
   <BackgroundModal className={visibleModal ? 'showModal' : 'hideModal'}>
     <Modal>
       <Close onClick={e => handleCloseAddNewVideo(e)}>
-        <i className="fa fa-times-circle" aria-hidden="true" />
+        <i className="fa fa-times" aria-hidden="true" />
       </Close>
       <Content>
         <Title>
 Adicionar vídeo
         </Title>
-        <Form onSubmit={e => handleAddNewVideo(e, { title: linkInput, link: titleInput })}>
+        <Form onSubmit={e => handleAddNewVideo(e, { title: titleInput, link: linkInput })}>
           <input
             type="text"
             name="title"

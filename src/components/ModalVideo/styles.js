@@ -22,10 +22,18 @@ export const Close = styled.span`
   position: absolute;
   right: -25px;
   top: -25px;
+  background: #fff;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 
   i {
     color: #5a6978;
     font-size: 50px;
+    position: absolute;
+    top: 49.5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 `;
 

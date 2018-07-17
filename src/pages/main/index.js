@@ -17,7 +17,6 @@ class Main extends Component {
   state = {
     modalVideoVisible: false,
     modalAddNewVisible: false,
-    searchInput: '',
     videoActive: {
       id: '',
       title: '',
@@ -26,13 +25,15 @@ class Main extends Component {
     },
     titleInput: '',
     linkInput: '',
+    searchInput: '',
     videosListArray: [],
+    videosOriginals: [],
   };
 
   async componentWillMount() {
     const { data } = await api.get('/videos');
 
-    this.setState({ videosListArray: data.videos });
+    this.setState({ videosListArray: data.videos, videosOriginals: data.videos });
   }
 
   handleOpenModalVideo = (event, videoActive) => {
@@ -48,7 +49,7 @@ class Main extends Component {
 
     videos[index] = videoSelected;
 
-    this.setState({ videosListArray: videos, videoActive, modalVideoVisible: true });
+    this.setState({ videosListArray: videos, videosOriginals: videos, videoActive, modalVideoVisible: true });
   };
 
   handleLikeVideo = (event, id) => {
@@ -64,7 +65,7 @@ class Main extends Component {
 
     videos[index] = videoSelected;
 
-    this.setState({ videosListArray: videos });
+    this.setState({ videosListArray: videos, videosOriginals: videos });
   }
 
   handleOpenAddModal = (event) => {
@@ -76,18 +77,24 @@ class Main extends Component {
   handleAddNewVideo = (event, { title, link }) => {
     event.preventDefault();
 
-    const { videosListArray } = this.state;
+    const { videosListArray, videosOriginals } = this.state;
 
     const idVideo = link.split('https://youtu.be/');
 
     const id = idVideo[1];
 
-    console.log(title);
-
     this.setState({
       titleInput: '',
       linkInput: '',
       videosListArray: [...videosListArray,
+        {
+          id,
+          title,
+          views: 0,
+          likes: 0,
+        },
+      ],
+      videosOriginals: [...videosOriginals,
         {
           id,
           title,
@@ -127,19 +134,29 @@ class Main extends Component {
   }
 
   handleSearch = (event) => {
-    event.preventDefault();
-
     const {
       videosListArray: videos,
+      searchInput,
+      videosOriginals,
     } = this.state;
 
-    const newList = videos.filter(video => (
-      video.title.toLowerCase().search(event.target.value.toLowerCase() !== -1)
-    ));
+    this.setState({ searchInput: event.target.value });
 
-    this.setState({
-      videosListArray: newList,
+    const newList = videos.filter((video) => {
+      if (video.title.toLowerCase().includes(searchInput.toLowerCase())) {
+        return true;
+      }
+
+      return false;
     });
+
+    if (searchInput) {
+      this.setState({
+        videosListArray: newList,
+      });
+    } else {
+      this.setState({ videosListArray: videosOriginals });
+    }
   }
 
   handleSortByViews = (event) => {
@@ -149,7 +166,7 @@ class Main extends Component {
       videosListArray: videos,
     } = this.state;
 
-    const sortList = videos.sort((a, b) => a.views > b.views);
+    const sortList = videos.sort((a, b) => (a.views - b.views));
 
     this.setState({
       videosListArray: sortList,
@@ -163,7 +180,7 @@ class Main extends Component {
       videosListArray: videos,
     } = this.state;
 
-    const sortList = videos.sort((a, b) => a.likes > b.likes);
+    const sortList = videos.sort((a, b) => (a.likes - b.likes));
 
     this.setState({
       videosListArray: sortList,
@@ -172,7 +189,6 @@ class Main extends Component {
 
   render() {
     const {
-      searchInput,
       modalVideoVisible,
       modalAddNewVisible,
       videoActive,
@@ -184,7 +200,6 @@ class Main extends Component {
     return (
       <Fragment>
         <Header
-          searchInput={searchInput}
           handleSearch={this.handleSearch}
           handleOpenAddModal={this.handleOpenAddModal}
         />
